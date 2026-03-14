@@ -1,0 +1,179 @@
+{
+  "id": "tt0111161",
+  "type": "movie",
+  "primaryTitle": "The Shawshank Redemption",
+  "primaryImage": {
+    "url": "https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_.jpg",
+    "width": 1200,
+    "height": 1800
+  },
+  "startYear": 1994,
+  "runtimeSeconds": 8520,
+  "genres": [
+    "Drama"
+  ],
+  "rating": {
+    "aggregateRating": 9.3,
+    "voteCount": 3131893
+  },
+  "metacritic": {
+    "score": 82,
+    "reviewCount": 22
+  },
+  "plot": "A banker convicted of uxoricide forms a friendship over a quarter century with a hardened convict, while maintaining his innocence and trying to remain hopeful through simple compassion.",
+  "directors": [
+    {
+      "id": "nm0001104",
+      "displayName": "Frank Darabont",
+      "alternativeNames": [
+        "Ardeth Bey",
+        "Frank A. Darabont"
+      ],
+      "primaryImage": {
+        "url": "https://m.media-amazon.com/images/M/MV5BNjk0MTkxNzQwOF5BMl5BanBnXkFtZTcwODM5OTMwNA@@._V1_.jpg",
+        "width": 322,
+        "height": 400
+      },
+      "primaryProfessions": [
+        "director",
+        "producer",
+        "writer"
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "id": "nm0000175",
+      "displayName": "Stephen King",
+      "alternativeNames": [
+        "Richard Bachman",
+        "The Rock Bottom Remainders",
+        "John Swithen"
+      ],
+      "primaryImage": {
+        "url": "https://m.media-amazon.com/images/M/MV5BMjA2ODIxNDM4Nl5BMl5BanBnXkFtZTYwMjkzMzU1._V1_.jpg",
+        "width": 257,
+        "height": 400
+      },
+      "primaryProfessions": [
+        "actor",
+        "producer",
+        "writer"
+      ]
+    },
+    {
+      "id": "nm0001104",
+      "displayName": "Frank Darabont",
+      "alternativeNames": [
+        "Ardeth Bey",
+        "Frank A. Darabont"
+      ],
+      "primaryImage": {
+        "url": "https://m.media-amazon.com/images/M/MV5BNjk0MTkxNzQwOF5BMl5BanBnXkFtZTcwODM5OTMwNA@@._V1_.jpg",
+        "width": 322,
+        "height": 400
+      },
+      "primaryProfessions": [
+        "director",
+        "producer",
+        "writer"
+      ]
+    }
+  ],
+  "stars": [
+    {
+      "id": "nm0000209",
+      "displayName": "Tim Robbins",
+      "primaryImage": {
+        "url": "https://m.media-amazon.com/images/M/MV5BMTI1OTYxNzAxOF5BMl5BanBnXkFtZTYwNTE5ODI4._V1_.jpg",
+        "width": 311,
+        "height": 400
+      },
+      "primaryProfessions": [
+        "actor",
+        "director",
+        "producer"
+      ]
+    },
+    {
+      "id": "nm0000151",
+      "displayName": "Morgan Freeman",
+      "alternativeNames": [
+        "Morgan J. Freeman"
+      ],
+      "primaryImage": {
+        "url": "https://m.media-amazon.com/images/M/MV5BMTc0MDMyMzI2OF5BMl5BanBnXkFtZTcwMzM2OTk1MQ@@._V1_.jpg",
+        "width": 267,
+        "height": 400
+      },
+      "primaryProfessions": [
+        "actor",
+        "director",
+        "producer"
+      ]
+    },
+    {
+      "id": "nm0348409",
+      "displayName": "Bob Gunton",
+      "primaryImage": {
+        "url": "https://m.media-amazon.com/images/M/MV5BOWQ1ZTI1ZDgtMjhmZC00OWExLTliNWQtNzgxNTExZWIwMDJkXkEyXkFqcGc@._V1_.jpg",
+        "width": 3803,
+        "height": 4811
+      },
+      "primaryProfessions": [
+        "actor",
+        "soundtrack"
+      ]
+    },
+    {
+      "id": "nm0006669",
+      "displayName": "William Sadler",
+      "alternativeNames": [
+        "Bill Sadler"
+      ],
+      "primaryImage": {
+        "url": "https://m.media-amazon.com/images/M/MV5BMTA1NjU3NDg1MTheQTJeQWpwZ15BbWU2MDI4OTcxMw@@._V1_.jpg",
+        "width": 485,
+        "height": 582
+      },
+      "primaryProfessions": [
+        "actor",
+        "director",
+        "producer"
+      ]
+    }
+  ],
+  "originCountries": [
+    {
+      "code": "US",
+      "name": "United States"
+    }
+  ],
+  "spokenLanguages": [
+    {
+      "code": "eng",
+      "name": "English"
+    }
+  ],
+  "interests": [
+    {
+      "id": "in0000076",
+      "name": "Drama"
+    },
+    {
+      "id": "in0000077",
+      "name": "Epic",
+      "isSubgenre": true
+    },
+    {
+      "id": "in0000083",
+      "name": "Period Drama",
+      "isSubgenre": true
+    },
+    {
+      "id": "in0000085",
+      "name": "Prison Drama",
+      "isSubgenre": true
+    }
+  ]
+}
