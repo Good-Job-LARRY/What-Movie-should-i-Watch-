@@ -17,6 +17,15 @@ import math
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+
+TMDB_API_KEY = "89bd81b58ee3a4c71d9ffc79ca2b4795"  
+
+TMDB_GENRES = {
+    "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, 
+    "Documentary": 99, "Drama": 18, "Fantasy": 14, "Horror": 27, 
+    "Sci-Fi": 878, "Thriller": 53049
+}
+
 global genre
 
 genre = ["Action", "Adventure", "Animation", "Comedy", "Documentary", "Drama", "Fantasy","Horror","Sci-Fi","Thriller"]
@@ -24,19 +33,21 @@ genre_index = 0
 def FinalMovie():
     rootQuiz.destroy()
     if Review == True:
-        sort = "SORT_BY_USER_RATING"
+        sort = "vote_average.desc"
     else:
-        sort = "SORT_BY_POPULARITY"
+        sort = "popularity.desc"
+        
+   
+    genre_id = TMDB_GENRES.get(genre_name, "")
     paramaters = {
-        "genres": genre_name,
-        "interestsIds": [interests],
-        "types": "MOVIE",
-        "startYear": StartYear,
-        "endYear": EndYear,
-        "sortBy": sort,
-        "sortOrder": "DESC",
-        "minVoteCount": 10000
+        "with_genres": f"{genre_id},{interests}" if interests else str(genre_id),
+        "sort_by": sort,
+        "vote_count.gte": 100 
     }
+    if StartYear:
+        paramaters["primary_release_date.gte"] = f"{StartYear}-01-01"
+    if EndYear:
+        paramaters["primary_release_date.lte"] = f"{EndYear}-12-31"
 
     recommendFile = getMovies(paramaters)
     data = recommendFile.get("titles", [])
@@ -77,7 +88,7 @@ def FinalMovie():
     tk.Label(rootFinal, text="Your recommended movie",
             font=('Haettenschweiler', 36), bg="snow", fg="grey1").pack(pady=20)
 
-    # Poster
+
     try:
         if image_url:
             with urllib.request.urlopen(image_url, timeout=10) as u:
@@ -121,21 +132,30 @@ def Quiz(position):
     rootQuiz.resizable(False,False)
     rootQuiz._image_references = [] 
     paramaters = {"Id": idArray[position]}
-    request2 = requests.get(f"https://api.imdbapi.dev/titles/{idArray[position]}")
-    YourFav = request2.json()
+    
+    
+    request2 = requests.get(f"https://api.themoviedb.org/3/movie/{idArray[position]}?api_key={TMDB_API_KEY}")
+    tmdb_movie = request2.json()
+    
+
+    YourFav = {
+        "primaryTitle": tmdb_movie.get("title", "Unknown"),
+        "interests": [{"name": g.get("name"), "id": g.get("id"), "isSubgenre": True} for g in tmdb_movie.get("genres", [])]
+    }
+    
     with open("YourFav.json","w") as file :
         json.dump(YourFav,file, indent = 3)
     MainTitle = tk.Label(rootQuiz, text = "Personality Quiz", font=('Haettenschweiler', 36), bg="snow", fg="grey1")
     MainTitle.place(x= 350, y= 50)
-    # Create outer container frame
+   
     containerFrame = tk.Frame(rootQuiz, bg="snow", relief="solid", borderwidth=5, width=400, height=700)
     containerFrame.place(x=290, y=160)
     containerFrame.pack_propagate(False)
     
-    # Create canvas with scrollbar
+   
     canvas = tk.Canvas(containerFrame, bg="snow", highlightthickness=0)
     scrollbar = tk.Scrollbar(containerFrame, orient="vertical", command=canvas.yview)
-    # Set initial size - will be updated by canvas configure
+   
     scrollable_frame = tk.Frame(canvas, bg="snow", width=390, height=1600)
     
     def update_scroll_region(event=None):
@@ -150,7 +170,7 @@ def Quiz(position):
     canvas.configure(yscrollcommand=scrollbar.set)
     
     def on_canvas_configure(event):
-        # Update the width of the canvas window to match canvas width
+       
         canvas_width = event.width
         if canvas_width > 1:
             canvas.itemconfig(canvas_window, width=canvas_width)
@@ -160,7 +180,7 @@ def Quiz(position):
     canvas.pack(side="left", fill="both", expand=True)
     canvas.bind("<Configure>", on_canvas_configure)
     
-    # Use scrollable_frame as idFrame for all widgets
+   
     idFrame = scrollable_frame
     script_dir = os.path.dirname(os.path.abspath(__file__))
     image_path = os.path.join(script_dir, "images/crimb paper.jpg")
@@ -174,13 +194,13 @@ def Quiz(position):
     imageBar_img.place(x=0, y=1450)
     topPop = Image.open(image_path)
     topPop = topPop.convert("RGBA")
-    # Resize to fit frame width (390px) while maintaining aspect ratio
+
     topPop = topPop.resize((390, int(900 * 390 / 700)), Image.Resampling.LANCZOS)
     topPop_photo = ImageTk.PhotoImage(topPop)
     rootQuiz._image_references.append(topPop_photo) 
     topPop_img = tk.Label(idFrame, image = topPop_photo, borderwidth=0, highlightthickness=0)
     topPop_img.place(x = 0, y= 0)
-    #topPop_img.lower()
+    
     topPop2 = topPop.resize((390, int(900 * 390 / 700)), Image.Resampling.LANCZOS)
     topPop_photo2 = ImageTk.PhotoImage(topPop2)
     rootQuiz._image_references.append(topPop_photo2)  # Keep reference
@@ -235,7 +255,7 @@ def Quiz(position):
             if len(jInterest )==2:
                 break
     tk.Label(idFrame, text = title, font = ('MS Gothic', 20), bg="snow", fg="grey1").place(x= 0, y = 350)
-    # Display 4 posters from the MoviePic screen (cached in MOVIE_IMAGE_CACHE).
+   
     selected_ids = []
     if position is not None:
         selected_ids.append(idArray[position])
@@ -330,7 +350,7 @@ def Quiz(position):
     EnterButton = tk.Button(idFrame, text="Enter", font=('MS Gothic', 20), bg="snow", fg="grey1", command=on_submit)
     EnterButton.place(x=0, y=1580)
     rootQuiz.bind("<Return>", lambda e: on_submit())
-    # Bind mousewheel scrolling (works on Windows and Mac)
+
     def on_mousewheel(event):
         if event.delta:
             # Windows
@@ -355,28 +375,27 @@ def Quiz(position):
     canvas.bind("<Enter>", bind_mousewheel)
     canvas.bind("<Leave>", unbind_mousewheel)
     
-    # Force the scrollable_frame to update its size based on content
+  
     def force_frame_update():
         rootQuiz.update_idletasks()
         canvas.update_idletasks()
-        # Calculate the required height based on the highest widget (y=1000) plus padding
+  
         required_height = 1600
         scrollable_frame.config(width=390, height=required_height)
-        # Update scroll region
+      
         canvas.configure(scrollregion=canvas.bbox("all"))
     
-    # Update scroll region after all widgets are placed
-    rootQuiz.after(50, force_frame_update)  # Delay slightly to ensure all widgets are rendered
-    rootQuiz.update_idletasks()  # Also update immediately
+    
+    rootQuiz.after(50, force_frame_update)  
+    rootQuiz.update_idletasks()  
     
     rootQuiz.mainloop()
 
 Image.MAX_IMAGE_PIXELS = 200000000
 _PLACEHOLDER_IMAGE = Image.new("RGB", (250, 375), (40, 40, 60))
 
-# Cache poster images across screens.
-# Store PIL Images (not ImageTk.PhotoImage) because PhotoImage objects are tied to a specific Tk root.
-MOVIE_IMAGE_CACHE = {}  # {movie_id: PIL.Image.Image}
+
+MOVIE_IMAGE_CACHE = {}  
 
 def MoviePic(index):
     global idArray, root3, genre_index
@@ -401,24 +420,25 @@ def MoviePic(index):
     tk.Label(container, text="Which of these movies do you like most?", 
              font=('Haettenschweiler', 36), bg="snow", fg="grey1").pack(pady=20)
     
-    # Loading indicator
+    
     loading_label = tk.Label(container, text="Loading movies...", 
                             font=('Arial', 18), bg="tomato1", fg="snow")
     loading_label.pack(pady=20)
     root3.update()
     
+
+    genre_id = TMDB_GENRES.get(genre[index], "")
     paramaters = {
-        "genres": genre[index],
-        "types": "MOVIE",
-        "sortBy": "SORT_BY_POPULARITY",
-        "endYear": 2025
+        "with_genres": str(genre_id),
+        "sort_by": "popularity.desc",
+        "primary_release_date.lte": "2025-12-31"
     }
     
     try:
         titleFile = getMovies(paramaters)
         readTitles = titleFile.get("titles", [])
         
-        # Write JSON file in background thread to avoid blocking UI
+        
         def write_json_file():
             try:
                 with open("titleFile.json", 'w') as file:
@@ -470,7 +490,7 @@ def MoviePic(index):
     num_movies = min(8, len(readTitles))
     selected_movies = random.sample(readTitles, num_movies)
     
-    # Create movie frames first with placeholders
+   
     movie_frames = []
     
     for i, movie in enumerate(selected_movies):
@@ -489,16 +509,16 @@ def MoviePic(index):
     
     loading_label.destroy()
     
-    # Load images in parallel using ThreadPoolExecutor
+  
     def load_images_async():
         with ThreadPoolExecutor(max_workers=4) as executor:
-            # Submit all image loading tasks
+           
             future_to_index = {}
             for idx, (movie_frame, image_url, movie_title, i) in enumerate(movie_frames):
                 future = executor.submit(load_image_data, image_url)
                 future_to_index[future] = (idx, movie_frame, movie_title, i)
             
-            # Process completed downloads as they finish
+   
             for future in as_completed(future_to_index):
                 idx, movie_frame, movie_title, i = future_to_index[future]
                 img_data = future.result()
@@ -506,7 +526,7 @@ def MoviePic(index):
                 if movie_id and img_data is not None:
                     MOVIE_IMAGE_CACHE[movie_id] = img_data
                 
-                # Convert to PhotoImage on main thread (capture all values to avoid closure issues)
+                
                 root3.after(0, lambda idx_val=idx, frame_val=movie_frame, title_val=movie_title, 
                            img_val=img_data, btn_idx_val=i: create_movie_widget(
                            idx_val, frame_val, title_val, img_val, btn_idx_val))
@@ -523,10 +543,10 @@ def MoviePic(index):
         tk.Label(movie_frame, text=movie_title, font=('Haettenschweiler', 25),
                 bg="snow", fg="black", wraplength=250).pack(pady=(5, 0))
         
-        # Update scroll region after each image loads
+        
         root3.after_idle(lambda: canvas.configure(scrollregion=canvas.bbox("all")))
 
-    # Start loading images in background
+
     threading.Thread(target=load_images_async, daemon=True).start()
 
     tk.Label(container, text="Click on any movie poster to continue",
@@ -566,47 +586,7 @@ def Start():
     lblChoose3.place(x = 10,y =150)
    
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    '''global frames 
-    frames = []
-    frame_index = [0]
-    loading_complete = [False]
-    global gif_label
-    gif_label = tk.Label(root2, borderwidth=0, highlightthickness=0, bg=root2.cget('bg'))
-    gif_label.place(x=0, y=0, relwidth=1, relheight=1)
-    gif_label.lower()
-    def load_gif():
-        global frames
-        gif_path = os.path.join(script_dir, "images/popcorn.gif")
-        gif = Image.open(gif_path)
-        
-        for i in range(gif.n_frames):
-            gif.seek(i)
-            frame = gif.copy()
-            frame = frame.resize((1350, 750), Image.Resampling.LANCZOS)
-            frame = frame.convert('RGBA')
-            frames.append(ImageTk.PhotoImage(frame))
-        
-        loading_complete[0] = True
-        gif_label.configure(image=frames[0])
-    image_path = os.path.join(script_dir, "images/transparent popcorn.png")
-    topPop = Image.open(image_path)
-    topPop = topPop.convert("RGBA")
-    topPop = topPop.resize((1350,750),Image.Resampling.LANCZOS)
-    topPop_photo = ImageTk.PhotoImage(topPop)
-    topPop_img = tk.Label(root2, image = topPop_photo, borderwidth=0, highlightthickness=0)
-    topPop_img.place(x = 0, y= 0)
-    topPop_img.lower()
-    def animate_gif():
-        if loading_complete[0] and len(frames) > 0:
-            frame_index[0] = (frame_index[0] + 1) % len(frames)
-            gif_label.configure(image=frames[frame_index[0]])
-        root2.after(33, animate_gif)
-
-    # Start loading in background thread
-    threading.Thread(target=load_gif, daemon=True).start()
-
-    # Start animation loop (will animate once frames are loaded)
-    animate_gif()'''
+   
     y_start = 240  
     spacing = 70   
     index = 0
@@ -674,9 +654,31 @@ def updateClock():
     label3.config(text=getTime())
     label3.after(1000, updateClock)
 
+
 def getMovies(param):
-    response = requests.get(f"https://api.imdbapi.dev/titles",params=param)
-    return response.json()
+    param["api_key"] = TMDB_API_KEY
+    param["include_adult"] = "false"
+    param["language"] = "en-US"
+    
+    response = requests.get("https://api.themoviedb.org/3/discover/movie", params=param)
+    raw_data = response.json()
+    
+  
+    mapped_movies = []
+    for m in raw_data.get("results", []):
+        year = m.get("release_date", "")[:4]
+        mapped_movies.append({
+            "id": m.get("id"),
+            "primaryTitle": m.get("title"),
+            "plot": m.get("overview"),
+            "startYear": year,
+            "runtimeSeconds": 100 * 60, 
+            "primaryImage": {
+                "url": f"https://image.tmdb.org/t/p/w500{m.get('poster_path')}" if m.get('poster_path') else ""
+            }
+        })
+        
+    return {"titles": mapped_movies}
     
 def main():
     global root
